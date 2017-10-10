@@ -14,6 +14,8 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import Math._
 
+import scala.util.Random.shuffle
+
 case class Photo(id: String,
                  latitude: Double,
                  longitude: Double)
@@ -31,7 +33,7 @@ object Flickr extends Flickr {
     val lines   = sc.textFile("src/main/resources/photos/dataForBasicSolution.csv")
     val raw     = rawPhotos(lines)
 
-    val initialMeans = ???
+    val initialMeans = shuffle(raw).take(kmeansKernels).map(x => (x.latitude,x.longitude))
     val means   = kmeans(initialMeans, raw)
 
 
@@ -58,9 +60,9 @@ class Flickr extends Serializable {
     val lon1 = toRadians(c1._2)
     val lat2 = toRadians(c2._1)
     val lon2 = toRadians(c2._2)
-    val x = (lon2-lon1) * Math.cos((lat1+lat2)/2);
-    val y = (lat2-lat1);
-    Math.sqrt(x*x + y*y) * R;
+    val x = (lon2-lon1) * Math.cos((lat1+lat2)/2)
+    val y = lat2-lat1
+    Math.sqrt(x*x + y*y) * R
   }
 
 
@@ -79,11 +81,30 @@ class Flickr extends Serializable {
   }
 
   /** Average the vectors */
-  def averageVectors(ps: Iterable[Photo]): (Double, Double) = ???
+  def averageVectors(ps: Iterable[Photo]): (Double, Double) = {
+    var lat, long, size = 0
+    ps.foreach(x => {
+      lat += x.latitude
+      long += x.longitude
+      size += 1
+    })
+    (lat/size, long/size)
+  }
 
-  def rawPhotos(lines: RDD[String]): RDD[Photo] = ???
+  def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.map(l => {val a = l.split(","); Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)})
 
 
-  @tailrec final def kmeans(means: Array[(Double, Double)], vectors: RDD[Photo], iter: Int = 1): Array[(Double, Double)] = ???
+  @tailrec final def kmeans(means: Array[(Double, Double)], vectors: RDD[Photo], iter: Int = 1): Array[(Double, Double)] = {
+    if (iter < kmeansMaxIterations){
+      var classes : Array[(Iterable[Photo])]
+      var currentclass = 0
+      vectors.foreach(x => {
+        currentclass = findClosest((x.latitude,x.longitude),means)
+        classes(currentclass) = classes(currentclass) ++ x
+      })
+    }
+    else
+      means
+  }
 
 }
