@@ -30,13 +30,12 @@ object Flickr extends Flickr {
   /** Main function */
   def main(args: Array[String]): Unit = {
 
-    val lines   = sc.textFile("src/main/resources/photos/dataForBasicSolution.csv")
+    val lines   = sc.textFile("src/main/resources/photos/dataForBasicSolution.csv").mapPartitions(_.drop(1))
     val raw     = rawPhotos(lines)
 
-    val initialMeans = shuffle(raw).take(kmeansKernels).map(x => (x.latitude,x.longitude))
+    val initialMeans = raw.takeSample(false,kmeansKernels).map(x => (x.latitude,x.longitude))
     val means   = kmeans(initialMeans, raw)
-
-
+    means.foreach(x=>println(x))
   }
 }
 
@@ -70,7 +69,7 @@ class Flickr extends Serializable {
   def findClosest(p: (Double, Double), centers: Array[(Double, Double)]): Int = {
     var bestIndex = 0
     var closest = Double.PositiveInfinity
-    for (i <- 0 until centers.length) {
+    for (i <- centers.indices) {
       val tempDist = distanceInMeters(p, centers(i))
       if (tempDist < closest) {
         closest = tempDist
@@ -82,7 +81,7 @@ class Flickr extends Serializable {
 
   /** Average the vectors */
   def averageVectors(ps: Iterable[Photo]): (Double, Double) = {
-    var lat, long, size = 0
+    var lat, long, size = 0.0
     ps.foreach(x => {
       lat += x.latitude
       long += x.longitude
@@ -93,18 +92,34 @@ class Flickr extends Serializable {
 
   def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.map(l => {val a = l.split(","); Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)})
 
+  def euclideanDistance(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]) = {
+    assert(means.length == newMeans.length)
+    var sum = 0d
+    ((means zip newMeans) map {case (a, b) => distanceInMeters(a,b)}).foreach(sum += _)
+    sum
+  }
 
   @tailrec final def kmeans(means: Array[(Double, Double)], vectors: RDD[Photo], iter: Int = 1): Array[(Double, Double)] = {
-    if (iter < kmeansMaxIterations){
-      var classes : Array[(Iterable[Photo])]
-      var currentclass = 0
-      vectors.foreach(x => {
-        currentclass = findClosest((x.latitude,x.longitude),means)
-        classes(currentclass) = classes(currentclass) ++ x
+    println(iter)
+    val newMeans = means.clone()
+    vectors.map(x => (findClosest((x.latitude, x.longitude), means), x))
+      .groupByKey
+      .map(x => averageVectors(x._2))
+      .collect
+      .foreach(x => {
+        newMeans.update(findClosest((x._1,x._2),means),x)
       })
+
+    val distance = euclideanDistance(means, newMeans)
+
+    if (distance < kmeansEta)
+      newMeans
+    else if (iter < kmeansMaxIterations)
+      kmeans(newMeans, vectors, iter + 1)
+    else {
+      println("Reached max iterations!")
+      newMeans
     }
-    else
-      means
   }
 
 }
