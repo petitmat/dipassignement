@@ -14,7 +14,6 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import Math._
 
-import scala.util.Random.shuffle
 
 case class Photo(id: String,
                  latitude: Double,
@@ -33,7 +32,7 @@ object Flickr extends Flickr {
     val lines   = sc.textFile("src/main/resources/photos/dataForBasicSolution.csv").mapPartitions(_.drop(1))
     val raw     = rawPhotos(lines)
 
-    val initialMeans = raw.takeSample(false,kmeansKernels).map(x => (x.latitude,x.longitude))
+    val initialMeans = raw.takeSample(withReplacement = false,kmeansKernels).map(x => (x.latitude,x.longitude))
     val means   = kmeans(initialMeans, raw)
     means.foreach(x=>println(x))
   }
@@ -53,7 +52,7 @@ class Flickr extends Serializable {
   def kmeansMaxIterations = 50
 
   //(lat, lon)
-  def distanceInMeters(c1: (Double, Double), c2: (Double, Double)) = {
+  def distanceInMeters(c1: (Double, Double), c2: (Double, Double)): Double = {
     val R = 6371e3
     val lat1 = toRadians(c1._1)
     val lon1 = toRadians(c1._2)
@@ -92,7 +91,7 @@ class Flickr extends Serializable {
 
   def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.map(l => {val a = l.split(","); Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)})
 
-  def euclideanDistance(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]) = {
+  def euclideanDistance(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]): Double = {
     assert(means.length == newMeans.length)
     var sum = 0d
     ((means zip newMeans) map {case (a, b) => distanceInMeters(a,b)}).foreach(sum += _)
