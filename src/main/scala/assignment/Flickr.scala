@@ -44,10 +44,6 @@ object Flickr extends Flickr {
     val initialMeans = raw.takeSample(withReplacement = false,kmeansKernels).map(x => (x.latitude,x.longitude))
     val means   = kmeans(initialMeans, raw)
 
-    val meansFile = new PrintWriter(new File("src/main/resources/photos/means.csv" ))
-    means.foreach(x=>meansFile.println(x._1.toString + "," + x._2.toString))
-    meansFile.close()
-
     save_csv(means,"means.csv")
 
     // THIRD DIMENSION
