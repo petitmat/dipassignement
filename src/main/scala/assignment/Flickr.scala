@@ -48,10 +48,7 @@ object Flickr extends Flickr {
     means.foreach(x=>meansFile.println(x._1.toString + "," + x._2.toString))
     meansFile.close()
 
-    val pw = new PrintWriter(new File("src/main/resources/photos/means.csv" ))
-    means.foreach(x=>pw.println(x._1.toString + "," + x._2.toString))
-    pw.close()
-
+    save_csv(means,"means.csv")
 
     // THIRD DIMENSION
 
@@ -59,15 +56,20 @@ object Flickr extends Flickr {
     val raw_season     = rawPhotos(lines_season)
 
 
-    val raw_winter = splitSeason(raw_season,Season.WINTER)
-    val raw_spring = splitSeason(raw_season,Season.SPRING)
-    val raw_summer = splitSeason(raw_season,Season.SUMMER)
-    val raw_autumn = splitSeason(raw_season,Season.AUTUMN)
+    val rawWinter = splitSeason(raw_season,Season.WINTER)
+    val rawSpring = splitSeason(raw_season,Season.SPRING)
+    val rawSummer = splitSeason(raw_season,Season.SUMMER)
+    val rawAutumn = splitSeason(raw_season,Season.AUTUMN)
 
-    println(raw_winter.count())
-    println(raw_spring.count())
-    println(raw_summer.count())
-    println(raw_autumn.count())
+    val seasons = Array((rawWinter,"winter.csv"),(rawSpring,"spring.csv"),(rawSummer,"summer.csv"),(rawAutumn,"autumn.csv"))
+
+    for (season <- seasons){
+      val initialMeansSeason = season._1.takeSample(withReplacement = false,kmeansKernels).map(x => (x.latitude,x.longitude))
+      val means   = kmeans(initialMeansSeason, season._1)
+      save_csv(means,season._2)
+    }
+
+
 
     val elbow : Array[(Int,Double)]= (1 to 20).toArray.map(i => {
       val meansElbow = kmeans(raw.takeSample(withReplacement = false,i).map(x => (x.latitude,x.longitude)),raw)
@@ -116,6 +118,13 @@ class Flickr extends Serializable {
     sum
   }
 
+
+  /** Save into csv file*/
+  def save_csv(means:Array[(Double, Double)],filename : String) ={
+    val pw = new PrintWriter(new File("src/main/resources/photos/"+filename))
+    means.foreach(x=>pw.println(x._1.toString + "," + x._2.toString))
+    pw.close()
+  }
 
   /** Return the index of the closest mean */
   def findClosest(p: (Double, Double), centers: Array[(Double, Double)]): Int = {
