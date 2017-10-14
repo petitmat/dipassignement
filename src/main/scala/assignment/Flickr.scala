@@ -5,21 +5,29 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 import annotation.tailrec
-import scala.reflect.ClassTag
 
-import java.io.StringReader
-import com.opencsv.CSVReader
+import java.io._
 
 import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import Math._
-import java.io._
+
+import assignment.Season.Season
+
+
+object Season extends Enumeration {
+  type Season = Value
+  val WINTER,SPRING,SUMMER,AUTUMN = Value
+}
+
+
 
 
 case class Photo(id: String,
                  latitude: Double,
-                 longitude: Double)
-//datetime: Date)
+                 longitude: Double,
+                 datetime: Date)
 
 
 object Flickr extends Flickr {
@@ -40,6 +48,28 @@ object Flickr extends Flickr {
     val pw = new PrintWriter(new File("src/main/resources/photos/means.csv" ))
     means.foreach(x=>pw.println(x._1.toString + "," + x._2.toString))
     pw.close()
+
+
+    // THIRD DIMENSION
+
+
+
+    //Third  Dimension
+
+    val lines_season   = sc.textFile("src/main/resources/photos/flickr3D.csv").mapPartitions(_.drop(1))
+    val raw_season     = rawPhotos(lines_season)
+
+
+    val raw_winter = splitSeason(raw_season,Season.WINTER)
+    val raw_spring = splitSeason(raw_season,Season.SPRING)
+    val raw_summer = splitSeason(raw_season,Season.SUMMER)
+    val raw_autumn = splitSeason(raw_season,Season.AUTUMN)
+
+    println(raw_winter.count())
+    println(raw_spring.count())
+    println(raw_summer.count())
+    println(raw_autumn.count())
+
   }
 }
 
@@ -96,7 +126,8 @@ class Flickr extends Serializable {
 
   def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.filter(s => "^[0-9]{11}, [0-9]{2,3}.[0-9]*, [0-9]{2,3}.[0-9]*, [0-9]{4}(:[0-9]{2}){2} ([0-9]{2}:){2}[0-9]{2}$".r.findFirstIn(s).isDefined).map(l => {
     val a = l.split(",")
-    Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)
+    var format = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss")
+    Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble,datetime = format.parse(a(3)))
   })
 
   def distanceInMeters(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]): Double = {
@@ -104,6 +135,33 @@ class Flickr extends Serializable {
     var sum = 0d
     ((means zip newMeans) map {case (a, b) => distanceInMeters(a,b)}).foreach(sum += _)
     sum
+  }
+
+  /** Find season from time stamp **/
+
+  def getSeason(timeStamp : Date): Season = {
+    val cal = Calendar.getInstance
+    cal.setTime(timeStamp)
+    val month = cal.get(Calendar.MONTH)
+    val season = month match {
+      case 0 => 0
+      case 1 => 0
+      case 2 => 1
+      case 3 => 1
+      case 4 => 1
+      case 5 => 2
+      case 6 => 2
+      case 7 => 2
+      case 8 => 3
+      case 9 => 3
+      case 10 => 3
+      case 11 => 0
+    }
+    Season(season)
+  }
+
+  def splitSeason(lines : RDD[Photo], season : Season): RDD[Photo]={
+    lines.filter(s => getSeason(s.datetime)==season)
   }
 
   @tailrec final def kmeans(means: Array[(Double, Double)], vectors: RDD[Photo], iter: Int = 1): Array[(Double, Double)] = {
