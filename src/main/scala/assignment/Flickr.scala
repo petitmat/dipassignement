@@ -91,7 +91,7 @@ class Flickr extends Serializable {
 
   def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.map(l => {val a = l.split(","); Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)})
 
-  def euclideanDistance(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]): Double = {
+  def distanceInMeters(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]): Double = {
     assert(means.length == newMeans.length)
     var sum = 0d
     ((means zip newMeans) map {case (a, b) => distanceInMeters(a,b)}).foreach(sum += _)
@@ -103,13 +103,13 @@ class Flickr extends Serializable {
     val newMeans = means.clone()
     vectors.map(x => (findClosest((x.latitude, x.longitude), means), x))
       .groupByKey
-      .map(x => averageVectors(x._2))
+      .map(x => (x._1,averageVectors(x._2)))
       .collect
       .foreach(x => {
-        newMeans.update(findClosest((x._1,x._2),means),x)
+        newMeans.update(x._1,x._2)
       })
 
-    val distance = euclideanDistance(means, newMeans)
+    val distance = distanceInMeters(means, newMeans)
 
     if (distance < kmeansEta)
       newMeans
