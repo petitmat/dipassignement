@@ -38,12 +38,15 @@ object Flickr extends Flickr {
   /** Main function */
   def main(args: Array[String]): Unit = {
 
-    val lines   = sc.textFile("src/main/resources/photos/flickrDirtySimple.csv").mapPartitions(_.drop(1))
+    val lines   = sc.textFile("src/main/resources/photos/elbow.csv").mapPartitions(_.drop(1))
     val raw     = rawPhotos(lines)
 
     val initialMeans = raw.takeSample(withReplacement = false,kmeansKernels).map(x => (x.latitude,x.longitude))
     val means   = kmeans(initialMeans, raw)
 
+    val meansFile = new PrintWriter(new File("src/main/resources/photos/means.csv" ))
+    means.foreach(x=>meansFile.println(x._1.toString + "," + x._2.toString))
+    meansFile.close()
 
     val pw = new PrintWriter(new File("src/main/resources/photos/means.csv" ))
     means.foreach(x=>pw.println(x._1.toString + "," + x._2.toString))
@@ -51,10 +54,6 @@ object Flickr extends Flickr {
 
 
     // THIRD DIMENSION
-
-
-
-    //Third  Dimension
 
     val lines_season   = sc.textFile("src/main/resources/photos/flickr3D.csv").mapPartitions(_.drop(1))
     val raw_season     = rawPhotos(lines_season)
@@ -70,6 +69,19 @@ object Flickr extends Flickr {
     println(raw_summer.count())
     println(raw_autumn.count())
 
+    val elbow : Array[(Int,Double)]= (1 to 20).toArray.map(i => {
+      val meansElbow = kmeans(raw.takeSample(withReplacement = false,i).map(x => (x.latitude,x.longitude)),raw)
+      val sum = raw.map(x => (findClosest((x.latitude,x.longitude),meansElbow), x))
+        .groupByKey
+        .map(x=> distanceInMeters(meansElbow(x._1),x._2))
+        .collect
+        .sum
+      (i,sum)
+    })
+
+    val elbowFile = new PrintWriter(new File("src/main/resources/photos/elbowResult.csv" ))
+    elbow.foreach(x=>elbowFile.println(x._1.toString + "," + x._2.toString))
+    elbowFile.close()
   }
 }
 
@@ -96,6 +108,12 @@ class Flickr extends Serializable {
     val x = (lon2-lon1) * Math.cos((lat1+lat2)/2)
     val y = lat2-lat1
     Math.sqrt(x*x + y*y) * R
+  }
+
+  def distanceInMeters(c1: (Double, Double), c2: Iterable[Photo]): Double = {
+    var sum = 0.0
+    c2.foreach(x => sum+=distanceInMeters(c1,(x.latitude,x.longitude)))
+    sum
   }
 
 
@@ -165,7 +183,6 @@ class Flickr extends Serializable {
   }
 
   @tailrec final def kmeans(means: Array[(Double, Double)], vectors: RDD[Photo], iter: Int = 1): Array[(Double, Double)] = {
-    println(iter)
     val newMeans = means.clone() //copy initialMeans in a new array
     vectors.map(x => (findClosest((x.latitude, x.longitude), means), x))//map all the photos to find the closest center and return RDD[(index, Photo)]
       .groupByKey// group this RDD by index and return RDD[(index,Iterable[Photo])]
