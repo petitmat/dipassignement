@@ -100,24 +100,24 @@ class Flickr extends Serializable {
 
   @tailrec final def kmeans(means: Array[(Double, Double)], vectors: RDD[Photo], iter: Int = 1): Array[(Double, Double)] = {
     println(iter)
-    val newMeans = means.clone()
-    vectors.map(x => (findClosest((x.latitude, x.longitude), means), x))
-      .groupByKey
-      .map(x => (x._1,averageVectors(x._2)))
-      .collect
+    val newMeans = means.clone() //copy initialMeans in a new array
+    vectors.map(x => (findClosest((x.latitude, x.longitude), means), x))//map all the photos to find the closest center and return RDD[(index, Photo)]
+      .groupByKey// group this RDD by index and return RDD[(index,Iterable[Photo])]
+      .map(x => (x._1,averageVectors(x._2)))// map the new RDD and calcul the new centers of each Iterable[Photo] return RDD[(index,(Double,Double))]
+      .collect//convert this RDD in an array Array[(index,(Double,Double))]
       .foreach(x => {
-        newMeans.update(x._1,x._2)
+        newMeans.update(x._1,x._2) //go through this Array and update newMeans(index) with latitude and longitude of the new center
       })
 
-    val distance = distanceInMeters(means, newMeans)
+    val distance = distanceInMeters(means, newMeans) //calculate totale distance in meters between initial centers and new centers (to check the convergence criteria).
 
-    if (distance < kmeansEta)
+    if (distance < kmeansEta) //if convergence criteria is reached we break the recursivity
       newMeans
-    else if (iter < kmeansMaxIterations)
+    else if (iter < kmeansMaxIterations)// else if the maxIterations criteria is not reached, we call recursively the function with newMeans
       kmeans(newMeans, vectors, iter + 1)
     else {
       println("Reached max iterations!")
-      newMeans
+      newMeans//if maxIterations criteria is reached we break the recursivity
     }
   }
 
