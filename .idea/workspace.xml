@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7cdfd884-f432-434c-8881-51bb6b6fcb36" name="Default" comment="">
+    <list default="true" id="7cdfd884-f432-434c-8881-51bb6b6fcb36" name="Default" comment="Add regex to filter dirty datas">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/photos/flickrDirtySimple.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$kmeans$1.class" afterPath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$kmeans$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$kmeans$2.class" afterPath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$kmeans$2.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$kmeans$3.class" afterPath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$kmeans$3.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$rawPhotos$1.class" afterPath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$$anonfun$rawPhotos$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$.class" afterPath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr$.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr.class" afterPath="$PROJECT_DIR$/target/scala-2.11/classes/assignment/Flickr.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/assignment/Flickr.scala" afterPath="$PROJECT_DIR$/src/main/scala/assignment/Flickr.scala" />
     </list>
@@ -25,8 +32,8 @@
       <file leaf-file-name="Flickr.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/assignment/Flickr.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="626">
-              <caret line="117" column="10" lean-forward="true" selection-start-line="117" selection-start-column="10" selection-end-line="117" selection-end-column="10" />
+            <state relative-caret-position="233">
+              <caret line="93" column="24" lean-forward="true" selection-start-line="93" selection-start-column="24" selection-end-line="93" selection-end-column="24" />
               <folding>
                 <element signature="e#20#53#0" expanded="true" />
               </folding>
@@ -34,11 +41,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="flickrDirtySimple.csv" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/photos/flickrDirtySimple.csv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="37650">
+              <caret line="2510" column="0" lean-forward="false" selection-start-line="2510" selection-start-column="0" selection-end-line="2510" selection-end-column="53" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="dataForBasicSolution.csv" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/photos/dataForBasicSolution.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+            <state relative-caret-position="138">
+              <caret line="10" column="39" lean-forward="false" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -52,6 +69,9 @@
       <find>sum</find>
       <find>141</find>
       <find>61.890754</find>
+      <find>36223872643</find>
+      <find>None</find>
+      <find>,</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -66,6 +86,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$USER_HOME$/Downloads/dipassignment/src/main/scala/assignment/Flickr.scala" />
+        <option value="$PROJECT_DIR$/src/main/resources/photos/flickrDirtySimple.csv" />
         <option value="$PROJECT_DIR$/src/main/scala/assignment/Flickr.scala" />
       </list>
     </option>
@@ -159,6 +180,11 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/photos" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -322,7 +348,7 @@
       <workItem from="1506260087926" duration="7603000" />
       <workItem from="1506610464049" duration="620000" />
       <workItem from="1507637248945" duration="1109000" />
-      <workItem from="1507916452793" duration="15041000" />
+      <workItem from="1507916452793" duration="18859000" />
     </task>
     <task id="LOCAL-00001" summary="Remove unused library">
       <created>1507927128405</created>
@@ -338,11 +364,18 @@
       <option name="project" value="LOCAL" />
       <updated>1507977731548</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add some comments">
+      <created>1507981320557</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1507981320557</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24373000" />
+    <option name="totallyTimeSpent" value="28191000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -359,7 +392,7 @@
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32941177" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="SBT" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -401,7 +434,9 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Remove unused library" />
     <MESSAGE value="Changes in newMeans calculation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changes in newMeans calculation" />
+    <MESSAGE value="Add some comments" />
+    <MESSAGE value="Add regex to filter dirty datas" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add regex to filter dirty datas" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -501,16 +536,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/photos/dataForBasicSolution.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+        <state relative-caret-position="138">
+          <caret line="10" column="39" lean-forward="false" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/photos/flickrDirtySimple.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="37650">
+          <caret line="2510" column="0" lean-forward="false" selection-start-line="2510" selection-start-column="0" selection-end-line="2510" selection-end-column="53" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/assignment/Flickr.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="626">
-          <caret line="117" column="10" lean-forward="true" selection-start-line="117" selection-start-column="10" selection-end-line="117" selection-end-column="10" />
+        <state relative-caret-position="233">
+          <caret line="93" column="24" lean-forward="true" selection-start-line="93" selection-start-column="24" selection-end-line="93" selection-end-column="24" />
           <folding>
             <element signature="e#20#53#0" expanded="true" />
           </folding>

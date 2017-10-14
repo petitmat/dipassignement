@@ -13,6 +13,7 @@ import com.opencsv.CSVReader
 import java.util.Date
 import java.text.SimpleDateFormat
 import Math._
+import scala.util.Try
 
 
 case class Photo(id: String,
@@ -29,7 +30,7 @@ object Flickr extends Flickr {
   /** Main function */
   def main(args: Array[String]): Unit = {
 
-    val lines   = sc.textFile("src/main/resources/photos/dataForBasicSolution.csv").mapPartitions(_.drop(1))
+    val lines   = sc.textFile("src/main/resources/photos/flickrDirtySimple.csv").mapPartitions(_.drop(1))
     val raw     = rawPhotos(lines)
 
     val initialMeans = raw.takeSample(withReplacement = false,kmeansKernels).map(x => (x.latitude,x.longitude))
@@ -89,7 +90,11 @@ class Flickr extends Serializable {
     (lat/size, long/size)
   }
 
-  def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.map(l => {val a = l.split(","); Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)})
+  def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.filter(s => "^[0-9]{11}, [0-9]{2,3}.[0-9]*, [0-9]{2,3}.[0-9]*, [0-9]{4}(:[0-9]{2}){2} ([0-9]{2}:){2}[0-9]{2}$".r.findFirstIn(s).isDefined).map(l => {
+    val a = l.split(",")
+    println(l)
+    Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)
+  })
 
   def distanceInMeters(means: Array[(Double, Double)], newMeans: Array[(Double, Double)]): Double = {
     assert(means.length == newMeans.length)
@@ -103,13 +108,13 @@ class Flickr extends Serializable {
     val newMeans = means.clone() //copy initialMeans in a new array
     vectors.map(x => (findClosest((x.latitude, x.longitude), means), x))//map all the photos to find the closest center and return RDD[(index, Photo)]
       .groupByKey// group this RDD by index and return RDD[(index,Iterable[Photo])]
-      .map(x => (x._1,averageVectors(x._2)))// map the new RDD and calcul the new centers of each Iterable[Photo] return RDD[(index,(Double,Double))]
+      .map(x => (x._1,averageVectors(x._2)))// map the new RDD and calculate the new centers of each Iterable[Photo] return RDD[(index,(Double,Double))]
       .collect//convert this RDD in an array Array[(index,(Double,Double))]
       .foreach(x => {
         newMeans.update(x._1,x._2) //go through this Array and update newMeans(index) with latitude and longitude of the new center
       })
 
-    val distance = distanceInMeters(means, newMeans) //calculate totale distance in meters between initial centers and new centers (to check the convergence criteria).
+    val distance = distanceInMeters(means, newMeans) //calculate total distance in meters between initial centers and new centers (to check the convergence criteria).
 
     if (distance < kmeansEta) //if convergence criteria is reached we break the recursivity
       newMeans
