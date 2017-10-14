@@ -13,7 +13,7 @@ import com.opencsv.CSVReader
 import java.util.Date
 import java.text.SimpleDateFormat
 import Math._
-import scala.util.Try
+import java.io._
 
 
 case class Photo(id: String,
@@ -35,7 +35,11 @@ object Flickr extends Flickr {
 
     val initialMeans = raw.takeSample(withReplacement = false,kmeansKernels).map(x => (x.latitude,x.longitude))
     val means   = kmeans(initialMeans, raw)
-    means.foreach(x=>println(x))
+
+
+    val pw = new PrintWriter(new File("src/main/resources/photos/means.csv" ))
+    means.foreach(x=>pw.println(x._1.toString + "," + x._2.toString))
+    pw.close()
   }
 }
 
@@ -92,7 +96,6 @@ class Flickr extends Serializable {
 
   def rawPhotos(lines: RDD[String]): RDD[Photo] = lines.filter(s => "^[0-9]{11}, [0-9]{2,3}.[0-9]*, [0-9]{2,3}.[0-9]*, [0-9]{4}(:[0-9]{2}){2} ([0-9]{2}:){2}[0-9]{2}$".r.findFirstIn(s).isDefined).map(l => {
     val a = l.split(",")
-    println(l)
     Photo(id = a(0), latitude = a(1).toDouble, longitude = a(2).toDouble)
   })
 
